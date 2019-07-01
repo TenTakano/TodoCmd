@@ -1,5 +1,5 @@
 defmodule Task do
-  defstruct status: "", title: "", add: "", finished: "", details: [], tags: []
+  defstruct [:status, :title, :add, :finished, :detals, :tags]
 end
 
 defmodule Todocmd do
@@ -21,18 +21,29 @@ defmodule Todocmd do
                                                   |> Poison.decode!
 
     tasks = case File.read(targetdir) do
-              {:ok, body} -> Poison.decode!(body)
-              {:error, reason} -> [] 
+              {:ok, body} -> Poison.decode!(body, as: [%Task{}])
+              {:error, reason} -> []
             end
 
     [subcommand | args] = args
     tasks = case subcommand do
-              "add"     -> IO.puts "add command"
+              "add"     -> add(args, tasks)
               "done"    -> IO.puts "done command"
               "cancel"  -> IO.puts "cancel command"
               "mod"     -> IO.puts "mod command"
               "flush"   -> IO.puts "flush command"
               "list"    -> IO.puts "list command"
             end
+
+    result = File.write(targetdir, Poison.encode!(tasks))
+    case result do
+      :ok               -> IO.inspect(tasks)
+      {:error, reason}  -> IO.puts(reason)
+    end
+  end
+
+  def add(arg, tasks) do
+    [title | arg] = arg
+    [%Task{title: title, add: Time.utc_now} | tasks]
   end
 end
