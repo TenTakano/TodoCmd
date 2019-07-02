@@ -1,4 +1,4 @@
-defmodule Task do
+defmodule Ticket do
   defstruct [:status, :title, :add, :finished, :detals, :tags]
 end
 
@@ -21,7 +21,7 @@ defmodule Todocmd do
                                                   |> Poison.decode!
 
     tasks = case File.read(targetdir) do
-              {:ok, body} -> Poison.decode!(body, as: [%Task{}])
+              {:ok, body} -> Poison.decode!(body, as: [%Ticket{}])
               {:error, reason} -> []
             end
 
@@ -44,6 +44,6 @@ defmodule Todocmd do
 
   def add(arg, tasks) do
     [title | arg] = arg
-    [%Task{title: title, add: Time.utc_now} | tasks]
+    [%Ticket{title: title, add: Time.utc_now} | tasks]
   end
 end
