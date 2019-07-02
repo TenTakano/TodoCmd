@@ -1,5 +1,12 @@
 defmodule Ticket do
-  defstruct [:status, :title, :add, :finished, :detals, :tags]
+  defstruct [:index, :status, :title, :add, :finished, :detals, :tags]
+
+  @behaviour Access
+
+  @impl Access
+  def fetch(term, key) do
+    Access.fetch(Map.from_struct(term), key)
+  end
 end
 
 defmodule Todocmd do
@@ -37,8 +44,18 @@ defmodule Todocmd do
 
     result = File.write(targetdir, Poison.encode!(tasks))
     case result do
-      :ok               -> IO.inspect(tasks)
+      :ok               -> show(Enum.count(tasks), tasks)
       {:error, reason}  -> IO.puts(reason)
+    end
+  end
+
+  def show(index, tasks) do
+    case index do
+      n when n == 0 ->
+        IO.inspect(Enum.at(tasks, index))
+      n when n > 0 ->
+        show(index - 1, tasks)
+        IO.inspect(Enum.at(tasks, index))
     end
   end
 
