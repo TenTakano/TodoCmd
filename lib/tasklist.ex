@@ -33,8 +33,21 @@ end
 
 defmodule TicketList do
   def show(tasks) do
-    tasks |> update_in([Access.all], &Ticket.toString/1)
-          |> Enum.each(fn t -> IO.puts(t) end)
+    addIndex = fn i, str ->
+      Integer.to_string(i) <> ", " <> str
+    end
+
+    puts = fn 
+      [head | []],   _f -> [addIndex.(1, head)]
+      [head | tail],  f ->
+        newStr = addIndex.(Enum.count(tail) + 1, head)
+        [newStr | f.(tail, f)]
+    end
+
+    list = tasks |> update_in([Access.all], &Ticket.toString/1)
+                 |> puts.(puts)
+                 |> Enum.reverse
+                 |> Enum.each(fn line -> IO.puts line end)
   end
 
   def add(arg, tasks) do
