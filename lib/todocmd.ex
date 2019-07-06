@@ -17,13 +17,14 @@ defmodule Todocmd do
                                                   |> Poison.decode!
 
     tasks = case File.read(targetdir) do
-              {:ok, body} -> Poison.decode!(body, as: [%Ticket{}])
-              {:error, reason} -> []
+              {:error, _} -> []
+              {:ok, body} -> body |> Poison.decode!(as: [%Ticket{}])
+                                  |> update_in([Access.all, :add], &DateTime.from_iso8601/1)
             end
 
     [subcommand | args] = args
     tasks = case subcommand do
-              "add"     -> TaskList.add(args, tasks)
+              "add"     -> TicketList.add(args, tasks)
               "done"    -> IO.puts "done command"
               "cancel"  -> IO.puts "cancel command"
               "mod"     -> IO.puts "mod command"
@@ -33,7 +34,7 @@ defmodule Todocmd do
 
     result = File.write(targetdir, Poison.encode!(tasks))
     case result do
-      :ok               -> TaskList.show(Enum.count(tasks), tasks)
+      :ok               -> TicketList.show(tasks)
       {:error, reason}  -> IO.puts(reason)
     end
   end
