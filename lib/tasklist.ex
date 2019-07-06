@@ -31,14 +31,10 @@ defmodule Ticket do
   end
 end
 
-defmodule TaskList do
-  def show(index, tasks) when index == 0 do
-    Enum.at(tasks, index) |> Ticket.toString |> IO.puts
-  end
-
-  def show(index, tasks) when index > 0 do
-    show(index - 1, tasks)
-    Enum.at(tasks, index) |> Ticket.toString |> IO.puts
+defmodule TicketList do
+  def show(tasks) do
+    tasks |> update_in([Access.all], &Ticket.toString/1)
+          |> Enum.each(fn t -> IO.puts(t) end)
   end
 
   def add(arg, tasks) do

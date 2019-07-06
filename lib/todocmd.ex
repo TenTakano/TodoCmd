@@ -24,7 +24,7 @@ defmodule Todocmd do
 
     [subcommand | args] = args
     tasks = case subcommand do
-              "add"     -> TaskList.add(args, tasks)
+              "add"     -> TicketList.add(args, tasks)
               "done"    -> IO.puts "done command"
               "cancel"  -> IO.puts "cancel command"
               "mod"     -> IO.puts "mod command"
@@ -34,7 +34,7 @@ defmodule Todocmd do
 
     result = File.write(targetdir, Poison.encode!(tasks))
     case result do
-      :ok               -> TaskList.show(Enum.count(tasks) - 1, tasks)
+      :ok               -> TicketList.show(tasks)
       {:error, reason}  -> IO.puts(reason)
     end
   end
