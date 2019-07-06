@@ -11,8 +11,8 @@ defmodule Ticket do
   @impl Access
   def get_and_update(%Ticket{} = ticket, key, function) do
     {:ok, value} = Map.fetch(ticket, key)
-    {get_value, {:ok, new_value, _}} = function.(value)
-    {get_value, %{ticket | key => new_value}}
+    {getValue, {:ok, newValue, _}} = function.(value)
+    {getValue, %{ticket | key => newValue}}
   end
 
   @impl Access
