@@ -34,8 +34,9 @@ defmodule Todocmd do
 
     result = File.write(targetdir, Poison.encode!(tickets))
     case result do
-      :ok               -> TicketList.show(tickets)
       {:error, reason}  -> IO.puts(reason)
+      :ok               -> tickets |> TicketList.to_string
+                                   |> Enum.each(&(IO.puts &1))
     end
   end
 end
