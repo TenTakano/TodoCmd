@@ -21,18 +21,18 @@ defmodule Ticket do
     {value, struct(__MODULE__, data)}
   end
 
-  def toString(task) do
+  def toString(ticket) do
     # Todo: Implement timezone shift by soft cording
-    time = task[:add] |> DateTime.add(3600 * 9, :second)
-                      |> DateTime.to_string
-                      |> String.slice(0, 19)
+    time = ticket[:add] |> DateTime.add(3600 * 9, :second)
+                        |> DateTime.to_string
+                        |> String.slice(0, 19)
                       
-    task[:title] <> ", " <> time <> ", " <> task[:status]
+    ticket[:title] <> ", " <> time <> ", " <> ticket[:status]
   end
 end
 
 defmodule TicketList do
-  def show(tasks) do
+  def show(tickets) do
     addIndex = fn i, str ->
       Integer.to_string(i) <> ", " <> str
     end
@@ -44,33 +44,32 @@ defmodule TicketList do
         [newStr | f.(tail, f)]
     end
 
-    list = tasks |> Enum.filter(&(&1[:status] == " "))
-                 |> update_in([Access.all], &Ticket.toString/1)
-                 |> puts.(puts)
-                 |> Enum.reverse
-                 |> Enum.each(fn line -> IO.puts line end)
+    tickets |> Enum.filter(&(&1[:status] == " "))
+            |> update_in([Access.all], &Ticket.toString/1)
+            |> puts.(puts)
+            |> Enum.reverse
+            |> Enum.each(fn line -> IO.puts line end)
   end
 
-  def add(arg, tasks) do
-    [title | arg] = arg
-    [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tasks]
+  def add(arg, tickets) do
+    [title | _] = arg
+    [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
   end
 
-  def done(arg, tasks) do
-    [index | arg] = arg
+  def done(arg, tickets) do
+    [index | _] = arg
 
-    num = tasks |> Enum.filter(&(&1[:status] == " "))
-                |> Enum.count
+    todo = tickets |> Enum.filter(&(&1[:status] == " "))
+    num = Enum.count(todo)
 
     case num do
-      n when index > num ->
+      n when index > n ->
         IO.puts "Given index value was invalid"
-        tasks
-      n ->
-        item = tasks |> Enum.filter(&(&1[:status] == " ")) 
-                    |> Enum.at(String.to_integer(index) - 1)
-        item = %Ticket{item | status: "x"}
-        List.replace_at(tasks, String.to_integer(index) - 1, item)
+        tickets
+      _ ->
+        item = todo |> Enum.at(String.to_integer(index) - 1)
+                    |> (&(%Ticket{&1 | status: "x"})).()
+        List.replace_at(tickets, String.to_integer(index) - 1, item)
     end
   end
 end
