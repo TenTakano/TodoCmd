@@ -48,4 +48,20 @@ defmodule TodocmdTest do
     assert output[:title] == title
     assert output[:status] == " "
   end
+
+  test "Todo.done should return error if called with invalid args" do
+    {_, list} = makeSample
+    length = Enum.count(list)
+
+    invalids = [
+      [],
+      ["text"],
+      [length + 1],
+      [-1]
+    ]
+
+    Enum.each(invalids, fn item ->
+      assert {:error, :invalid_args} == TicketList.done(item, list)
+    end)
+  end
 end
