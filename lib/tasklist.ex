@@ -27,7 +27,7 @@ defmodule Ticket do
                       |> DateTime.to_string
                       |> String.slice(0, 19)
                       
-    task[:title] <> ", " <> time
+    task[:title] <> ", " <> time <> ", " <> task[:status]
   end
 end
 
@@ -44,7 +44,8 @@ defmodule TicketList do
         [newStr | f.(tail, f)]
     end
 
-    list = tasks |> update_in([Access.all], &Ticket.toString/1)
+    list = tasks |> Enum.filter(&(&1[:status] == " "))
+                 |> update_in([Access.all], &Ticket.toString/1)
                  |> puts.(puts)
                  |> Enum.reverse
                  |> Enum.each(fn line -> IO.puts line end)
@@ -52,6 +53,24 @@ defmodule TicketList do
 
   def add(arg, tasks) do
     [title | arg] = arg
-    [%Ticket{title: title, add: DateTime.utc_now} | tasks]
+    [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tasks]
+  end
+
+  def done(arg, tasks) do
+    [index | arg] = arg
+
+    num = tasks |> Enum.filter(&(&1[:status] == " "))
+                |> Enum.count
+
+    case num do
+      n when index > num ->
+        IO.puts "Given index value was invalid"
+        tasks
+      n ->
+        item = tasks |> Enum.filter(&(&1[:status] == " ")) 
+                    |> Enum.at(String.to_integer(index) - 1)
+        item = %Ticket{item | status: "x"}
+        List.replace_at(tasks, String.to_integer(index) - 1, item)
+    end
   end
 end
