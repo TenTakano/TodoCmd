@@ -1,17 +1,4 @@
 defmodule Todocmd do
-  @moduledoc """
-  Documentation for Todocmd.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Todocmd.hello()
-      :world
-
-  """
   def main(args) do
     %{"targetdir" => targetdir} = "./config.json" |> File.read!
                                                   |> Poison.decode!
