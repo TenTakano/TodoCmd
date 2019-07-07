@@ -11,7 +11,7 @@ defmodule Todocmd do
 
     [subcommand | args] = args
     tickets = case subcommand do
-              "add"     -> TicketList.add(args, tickets)
+              "add"     -> TicketList.Add.exec(args, tickets)
               "done"    -> TicketList.done(args, tickets)
               "cancel"  -> IO.puts "cancel command"
               "mod"     -> IO.puts "mod command"

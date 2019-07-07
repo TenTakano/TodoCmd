@@ -2,6 +2,8 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
+  alias TicketList.Add
+
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
                         hour: 18, minute: 50, second: 7, microsecond: {0, 0},
@@ -36,17 +38,21 @@ defmodule TodocmdTest do
   #   assert TicketList.to_string(list) == expected
   # end
 
-  test "Todo.add should return error if called with empty args" do
-    assert {:error, :invalid_args} == TicketList.add([], [])
-  end
+  test "test of Todo.add function" do
+    invalids = [
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["arg1", "arg2"], result: {:error, :invalid_args}}
+    ]
+    Enum.each(invalids, fn pair ->
+      assert TicketList.Add.exec(pair[:test_arg], []) == pair[:result]
+    end)
 
-  test "Todo.add returns new task list" do
-    title = "Title1"
-    output = TicketList.add([title], []) 
-                |> Enum.at(0)
+    arg = "arg1"
+    sample = [arg]  |> Add.exec([])
+                    |> Enum.at(0)
 
-    assert output[:title] == title
-    assert output[:status] == " "
+    assert sample[:title] == arg
+    assert sample[:status] == " "
   end
 
   test "Todo.done should return error if called with invalid args" do
