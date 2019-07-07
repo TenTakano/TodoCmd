@@ -32,7 +32,7 @@ defmodule Ticket do
 end
 
 defmodule TicketList do
-  def show(tickets) do
+  def to_string(tickets) do
     addIndex = fn i, str ->
       Integer.to_string(i) <> ", " <> str
     end
@@ -48,7 +48,6 @@ defmodule TicketList do
             |> update_in([Access.all], &Ticket.toString/1)
             |> puts.(puts)
             |> Enum.reverse
-            |> Enum.each(fn line -> IO.puts line end)
   end
 
   def add(arg, tickets) do
