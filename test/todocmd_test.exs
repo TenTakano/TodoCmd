@@ -2,7 +2,7 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
-  alias TicketList.Add
+  alias TicketList.{Add, Done}
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -38,13 +38,13 @@ defmodule TodocmdTest do
   #   assert TicketList.to_string(list) == expected
   # end
 
-  test "test of Todo.add function" do
+  test "test of add command" do
     invalids = [
       %{test_arg: [], result: {:error, :invalid_args}},
       %{test_arg: ["arg1", "arg2"], result: {:error, :invalid_args}}
     ]
     Enum.each(invalids, fn pair ->
-      assert TicketList.Add.exec(pair[:test_arg], []) == pair[:result]
+      assert Add.exec(pair[:test_arg], []) == pair[:result]
     end)
 
     arg = "arg1"
@@ -55,19 +55,38 @@ defmodule TodocmdTest do
     assert sample[:status] == " "
   end
 
-  test "Todo.done should return error if called with invalid args" do
-    {_, list} = makeSample
-    length = Enum.count(list)
+  test "test of done command" do
+    {_, list} = makeSample()
+    length = list |> Enum.filter(&(&1[:status] == " "))
+                  |> Enum.count
 
     invalids = [
-      [],
-      ["text"],
-      [length + 1],
-      [-1]
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["text"], result: {:error, :invalid_args}},
+      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
+      %{test_arg: [-1], result: {:error, :index_out_of_range}}
     ]
 
     Enum.each(invalids, fn item ->
-      assert {:error, :invalid_args} == TicketList.done(item, list)
+      assert item[:result] == Done.exec(item[:test_arg], list)
     end)
+
+    replace = fn index, list ->
+      item = list |> Enum.at(index)
+                  |> (&(%Ticket{&1 | status: "x"})).()
+      List.replace_at(list, index, item)
+    end
+
+    {_, list} = makeSample()
+    expected = replace.(0, list)
+    list = Done.exec([1], list)
+    assert expected == list
+
+    list = expected
+    expected = replace.(2, list)
+    list = Done.exec([1], list)
+    assert expected == list
+
+    IO.inspect expected
   end
 end

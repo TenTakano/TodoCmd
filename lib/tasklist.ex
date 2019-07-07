@@ -54,30 +54,4 @@ defmodule TicketList do
                 |> Enum.reverse
     end
   end
-
-  def done(arg, tickets) do
-    case arg do
-      [] -> {:error, :invalid_args}
-      [index | _] ->
-        case Enum.count(tickets) do
-          length when length == 0                -> {:error, :invalid_args}
-          _      when is_integer(index) == false -> {:error, :invalid_args}
-          _      when index < 1                  -> {:error, :invalid_args}
-          length when index > length             -> {:error, :invalid_args}
-          _ ->
-            todo = tickets |> Enum.filter(&(&1[:status] == " "))
-            num = Enum.count(todo)
-
-            case num do
-              n when index > n ->
-                IO.puts "Given index value was invalid"
-                tickets
-              _ ->
-                item = todo |> Enum.at(String.to_integer(index) - 1)
-                            |> (&(%Ticket{&1 | status: "x"})).()
-                List.replace_at(tickets, String.to_integer(index) - 1, item)
-            end
-        end
-    end
-  end
 end
