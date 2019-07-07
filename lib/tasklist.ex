@@ -33,42 +33,60 @@ end
 
 defmodule TicketList do
   def to_string(tickets) do
-    addIndex = fn i, str ->
-      Integer.to_string(i) <> ", " <> str
-    end
+    case Enum.count(tickets) do
+      0 -> 
+        {:error, :empty_list}
+      _ -> 
+        addIndex = fn i, str ->
+          Integer.to_string(i) <> ", " <> str
+        end
 
-    puts = fn 
-      [head | []],   _f -> [addIndex.(1, head)]
-      [head | tail],  f ->
-        newStr = addIndex.(Enum.count(tail) + 1, head)
-        [newStr | f.(tail, f)]
-    end
+        puts = fn 
+          [head | []],   _f -> [addIndex.(1, head)]
+          [head | tail],  f ->
+            newStr = addIndex.(Enum.count(tail) + 1, head)
+            [newStr | f.(tail, f)]
+        end
 
-    tickets |> Enum.filter(&(&1[:status] == " "))
-            |> update_in([Access.all], &Ticket.toString/1)
-            |> puts.(puts)
-            |> Enum.reverse
+        tickets |> Enum.filter(&(&1[:status] == " "))
+                |> update_in([Access.all], &Ticket.toString/1)
+                |> puts.(puts)
+                |> Enum.reverse
+    end
   end
 
   def add(arg, tickets) do
-    [title | _] = arg
-    [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
+    case arg do
+      [] -> {:error, :invalid_args}
+      _  ->
+        [title | _] = arg
+        [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
+    end
   end
 
   def done(arg, tickets) do
-    [index | _] = arg
+    case arg do
+      [] -> {:error, :invalid_args}
+      [index | _] ->
+        case Enum.count(tickets) do
+          length when length == 0                -> {:error, :invalid_args}
+          _      when is_integer(index) == false -> {:error, :invalid_args}
+          _      when index < 1                  -> {:error, :invalid_args}
+          length when index > length             -> {:error, :invalid_args}
+          _ ->
+            todo = tickets |> Enum.filter(&(&1[:status] == " "))
+            num = Enum.count(todo)
 
-    todo = tickets |> Enum.filter(&(&1[:status] == " "))
-    num = Enum.count(todo)
-
-    case num do
-      n when index > n ->
-        IO.puts "Given index value was invalid"
-        tickets
-      _ ->
-        item = todo |> Enum.at(String.to_integer(index) - 1)
-                    |> (&(%Ticket{&1 | status: "x"})).()
-        List.replace_at(tickets, String.to_integer(index) - 1, item)
+            case num do
+              n when index > n ->
+                IO.puts "Given index value was invalid"
+                tickets
+              _ ->
+                item = todo |> Enum.at(String.to_integer(index) - 1)
+                            |> (&(%Ticket{&1 | status: "x"})).()
+                List.replace_at(tickets, String.to_integer(index) - 1, item)
+            end
+        end
     end
   end
 end
