@@ -35,4 +35,17 @@ defmodule TodocmdTest do
 
   #   assert TicketList.to_string(list) == expected
   # end
+
+  test "Todo.add should return error if called with empty args" do
+    assert {:error, :invalid_args} == TicketList.add([], [])
+  end
+
+  test "Todo.add returns new task list" do
+    title = "Title1"
+    output = TicketList.add([title], []) 
+                |> Enum.at(0)
+
+    assert output[:title] == title
+    assert output[:status] == " "
+  end
 end

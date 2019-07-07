@@ -56,8 +56,12 @@ defmodule TicketList do
   end
 
   def add(arg, tickets) do
-    [title | _] = arg
-    [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
+    case arg do
+      [] -> {:error, :invalid_args}
+      _  ->
+        [title | _] = arg
+        [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
+    end
   end
 
   def done(arg, tickets) do
