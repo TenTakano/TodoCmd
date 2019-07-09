@@ -2,7 +2,7 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
-  alias TicketList.{Add, Done}
+  alias TicketList.{Show, Add, Done}
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -19,10 +19,6 @@ defmodule TodocmdTest do
     {sampleTime, sampleList}
   end
 
-  test "Todo.to_string should warn if empty list is given" do
-    assert {:error, :empty_list} == TicketList.to_string([])
-  end
-
   # Todo: uncomment when timezone issue is resolved
   # test "Todo.to_string function" do
   #   {time, list} = makeSample
@@ -37,6 +33,11 @@ defmodule TodocmdTest do
 
   #   assert TicketList.to_string(list) == expected
   # end
+
+  test "test of show command" do
+    assert Show.exec([], []) == {:error, :empty_list}
+    assert Show.exec(["arg"], []) == {:error, :invalid_args}
+  end
 
   test "test of add command" do
     invalids = [
