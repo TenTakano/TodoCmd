@@ -2,6 +2,8 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
+  alias TicketList.{Show, Add, Done}
+
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
                         hour: 18, minute: 50, second: 7, microsecond: {0, 0},
@@ -15,10 +17,6 @@ defmodule TodocmdTest do
     ]
 
     {sampleTime, sampleList}
-  end
-
-  test "Todo.to_string should warn if empty list is given" do
-    assert {:error, :empty_list} == TicketList.to_string([])
   end
 
   # Todo: uncomment when timezone issue is resolved
@@ -36,32 +34,57 @@ defmodule TodocmdTest do
   #   assert TicketList.to_string(list) == expected
   # end
 
-  test "Todo.add should return error if called with empty args" do
-    assert {:error, :invalid_args} == TicketList.add([], [])
+  test "test of show command" do
+    assert Show.exec([], []) == {:error, :empty_list}
+    assert Show.exec(["arg"], []) == {:error, :invalid_args}
   end
 
-  test "Todo.add returns new task list" do
-    title = "Title1"
-    output = TicketList.add([title], []) 
-                |> Enum.at(0)
+  test "test of add command" do
+    invalids = [
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["arg1", "arg2"], result: {:error, :invalid_args}}
+    ]
+    Enum.each(invalids, fn pair ->
+      assert Add.exec(pair[:test_arg], []) == pair[:result]
+    end)
 
-    assert output[:title] == title
-    assert output[:status] == " "
+    arg = "arg1"
+    sample = [arg]  |> Add.exec([])
+                    |> Enum.at(0)
+
+    assert sample[:title] == arg
+    assert sample[:status] == " "
   end
 
-  test "Todo.done should return error if called with invalid args" do
-    {_, list} = makeSample
-    length = Enum.count(list)
+  test "test of done command" do
+    {_, list} = makeSample()
+    length = list |> Enum.filter(&(&1[:status] == " "))
+                  |> Enum.count
 
     invalids = [
-      [],
-      ["text"],
-      [length + 1],
-      [-1]
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["text"], result: {:error, :invalid_args}},
+      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
+      %{test_arg: [-1], result: {:error, :index_out_of_range}}
     ]
 
     Enum.each(invalids, fn item ->
-      assert {:error, :invalid_args} == TicketList.done(item, list)
+      assert item[:result] == Done.exec(item[:test_arg], list)
     end)
+
+    replace = fn index, list ->
+      item = list |> Enum.at(index)
+                  |> (&(%Ticket{&1 | status: "x"})).()
+      List.replace_at(list, index, item)
+    end
+
+    {_, list} = makeSample()
+    expected = replace.(0, list)
+    list = Done.exec([1], list)
+    assert expected == list
+
+    list = expected
+    expected = replace.(2, list)
+    list = Done.exec([1], list)
   end
 end
