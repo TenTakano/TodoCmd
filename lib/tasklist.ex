@@ -30,28 +30,3 @@ defmodule Ticket do
     ticket[:title] <> ", " <> time <> ", " <> ticket[:status]
   end
 end
-
-defmodule TicketList do
-  def to_string(tickets) do
-    case Enum.count(tickets) do
-      0 -> 
-        {:error, :empty_list}
-      _ -> 
-        addIndex = fn i, str ->
-          Integer.to_string(i) <> ", " <> str
-        end
-
-        puts = fn 
-          [head | []],   _f -> [addIndex.(1, head)]
-          [head | tail],  f ->
-            newStr = addIndex.(Enum.count(tail) + 1, head)
-            [newStr | f.(tail, f)]
-        end
-
-        tickets |> Enum.filter(&(&1[:status] == " "))
-                |> update_in([Access.all], &Ticket.toString/1)
-                |> puts.(puts)
-                |> Enum.reverse
-    end
-  end
-end
