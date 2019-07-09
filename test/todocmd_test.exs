@@ -86,8 +86,5 @@ defmodule TodocmdTest do
     list = expected
     expected = replace.(2, list)
     list = Done.exec([1], list)
-    assert expected == list
-
-    IO.inspect expected
   end
 end
