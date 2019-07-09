@@ -4,7 +4,7 @@ defmodule TicketList.Show do
     case {result, Enum.count(tickets)} do
       {{:error, _}, _} -> result
       {:ok, 0} -> {:error, :empty_list}
-      {:ok, 1} ->
+      {:ok, _} ->
         addIndex = &(Integer.to_string(&1) <> ", " <> &2)
         
         puts = fn
@@ -14,7 +14,7 @@ defmodule TicketList.Show do
             [newStr | f.(tail, f)]
         end
 
-        tickets |> Enum.filter(&(&1[:stasus] == " "))
+        tickets |> Enum.filter(&(&1[:status] == " "))
                 |> update_in([Access.all], &Ticket.toString/1)
                 |> puts.(puts)
                 |> Enum.reverse
