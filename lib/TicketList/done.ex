@@ -20,13 +20,19 @@ defmodule TicketList.Finished do
     length = tickets  |> Enum.filter(&(&1[:status] == " "))
                       |> Enum.count
 
-    case args do
-      []                                        -> {:error, :invalid_args}
-      [_ | tail] when tail != []                -> {:error, :invalid_args}
-      [arg]      when is_integer(arg) == false  -> {:error, :invalid_args}
-      [index]    when index < 1                 -> {:error, :index_out_of_range}
-      [index]    when index > length            -> {:error, :index_out_of_range}
-      [index]                                   -> index
+    parse = fn arg ->
+      index = Integer.parse(arg)
+      case index do
+        :error                  -> {:error, :invalid_args}
+        {n, ""} when n < 0      -> {:error, :index_out_of_range}
+        {n, ""} when n > length -> {:error, :index_out_of_range}
+        {n, ""}                 -> n
+      end
+    end
+
+    case Enum.count(args) do
+      1 -> Enum.at(args, 0) |> parse.()
+      _ -> {:error, :invalid_args}
     end
   end
 

@@ -27,8 +27,8 @@ defmodule TodocmdTest do
     invalids = [
       %{test_arg: [], result: {:error, :invalid_args}},
       %{test_arg: ["text"], result: {:error, :invalid_args}},
-      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
-      %{test_arg: [-1], result: {:error, :index_out_of_range}}
+      %{test_arg: [Integer.to_string(length + 1)], result: {:error, :index_out_of_range}},
+      %{test_arg: [Integer.to_string(-1)], result: {:error, :index_out_of_range}}
     ]
 
     Enum.each(invalids, fn item ->
@@ -43,12 +43,12 @@ defmodule TodocmdTest do
 
     {_, list} = makeSample()
     expected = replace.(0, list)
-    list = f.([1], list)
+    list = f.(["1"], list)
     assert expected == list
 
     list = expected
     expected = replace.(2, list)
-    list = f.([1], list)
+    list = f.(["1"], list)
   end
 
   # Todo: uncomment when timezone issue is resolved
