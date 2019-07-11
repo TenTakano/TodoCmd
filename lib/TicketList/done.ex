@@ -1,5 +1,6 @@
 defmodule TicketList.Finished do
   def done(args, tickets), do: exec(args, tickets, "x")
+  def cancel(args, tickets), do: exec(args, tickets, "-")
 
   def exec(args, tickets, command) do
     result = parse_args(args, tickets)

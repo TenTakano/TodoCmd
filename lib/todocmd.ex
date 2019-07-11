@@ -22,7 +22,7 @@ defmodule Todocmd do
       "show"    -> Show.exec(args, tickets) |> Enum.each(&(IO.puts &1))
       "add"     -> exec_subcommand(args, tickets, &Add.exec/2)
       "done"    -> exec_subcommand(args, tickets, &Finished.done/2)
-      "cancel"  -> IO.puts "cancel command"
+      "cancel"  -> exec_subcommand(args, tickets, &Finished.cancel/2)
       "mod"     -> IO.puts "mod command"
       "flush"   -> IO.puts "flush command"
       "list"    -> IO.puts "list command"

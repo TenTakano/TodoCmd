@@ -19,6 +19,38 @@ defmodule TodocmdTest do
     {sampleTime, sampleList}
   end
 
+  defp callFinishedFunc(sign, f) do
+    {_, list} = makeSample()
+    length = list |> Enum.filter(&(&1[:status] == " "))
+                  |> Enum.count
+
+    invalids = [
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["text"], result: {:error, :invalid_args}},
+      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
+      %{test_arg: [-1], result: {:error, :index_out_of_range}}
+    ]
+
+    Enum.each(invalids, fn item ->
+      assert item[:result] == f.(item[:test_arg], list)
+    end)
+
+    replace = fn index, list ->
+      item = list |> Enum.at(index)
+                  |> (&(%Ticket{&1 | status: sign})).()
+      List.replace_at(list, index, item)
+    end
+
+    {_, list} = makeSample()
+    expected = replace.(0, list)
+    list = f.([1], list)
+    assert expected == list
+
+    list = expected
+    expected = replace.(2, list)
+    list = f.([1], list)
+  end
+
   # Todo: uncomment when timezone issue is resolved
   # test "Todo.to_string function" do
   #   {time, list} = makeSample
@@ -57,34 +89,10 @@ defmodule TodocmdTest do
   end
 
   test "test of done command" do
-    {_, list} = makeSample()
-    length = list |> Enum.filter(&(&1[:status] == " "))
-                  |> Enum.count
+    callFinishedFunc("x", &Finished.done/2)
+  end
 
-    invalids = [
-      %{test_arg: [], result: {:error, :invalid_args}},
-      %{test_arg: ["text"], result: {:error, :invalid_args}},
-      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
-      %{test_arg: [-1], result: {:error, :index_out_of_range}}
-    ]
-
-    Enum.each(invalids, fn item ->
-      assert item[:result] == Finished.done(item[:test_arg], list)
-    end)
-
-    replace = fn index, list ->
-      item = list |> Enum.at(index)
-                  |> (&(%Ticket{&1 | status: "x"})).()
-      List.replace_at(list, index, item)
-    end
-
-    {_, list} = makeSample()
-    expected = replace.(0, list)
-    list = Finished.done([1], list)
-    assert expected == list
-
-    list = expected
-    expected = replace.(2, list)
-    list = Finished.done([1], list)
+  test "test of cancel command" do
+    callFinishedFunc("-", &Finished.cancel/2)
   end
 end
