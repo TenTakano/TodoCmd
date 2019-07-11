@@ -2,7 +2,7 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
-  alias TicketList.{Show, Add, Done}
+  alias TicketList.{Show, Add, Finished}
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -17,6 +17,38 @@ defmodule TodocmdTest do
     ]
 
     {sampleTime, sampleList}
+  end
+
+  defp callFinishedFunc(sign, f) do
+    {_, list} = makeSample()
+    length = list |> Enum.filter(&(&1[:status] == " "))
+                  |> Enum.count
+
+    invalids = [
+      %{test_arg: [], result: {:error, :invalid_args}},
+      %{test_arg: ["text"], result: {:error, :invalid_args}},
+      %{test_arg: [Integer.to_string(length + 1)], result: {:error, :index_out_of_range}},
+      %{test_arg: [Integer.to_string(-1)], result: {:error, :index_out_of_range}}
+    ]
+
+    Enum.each(invalids, fn item ->
+      assert item[:result] == f.(item[:test_arg], list)
+    end)
+
+    replace = fn index, list ->
+      item = list |> Enum.at(index)
+                  |> (&(%Ticket{&1 | status: sign})).()
+      List.replace_at(list, index, item)
+    end
+
+    {_, list} = makeSample()
+    expected = replace.(0, list)
+    list = f.(["1"], list)
+    assert expected == list
+
+    list = expected
+    expected = replace.(2, list)
+    list = f.(["1"], list)
   end
 
   # Todo: uncomment when timezone issue is resolved
@@ -57,34 +89,10 @@ defmodule TodocmdTest do
   end
 
   test "test of done command" do
-    {_, list} = makeSample()
-    length = list |> Enum.filter(&(&1[:status] == " "))
-                  |> Enum.count
+    callFinishedFunc("x", &Finished.done/2)
+  end
 
-    invalids = [
-      %{test_arg: [], result: {:error, :invalid_args}},
-      %{test_arg: ["text"], result: {:error, :invalid_args}},
-      %{test_arg: [length + 1], result: {:error, :index_out_of_range}},
-      %{test_arg: [-1], result: {:error, :index_out_of_range}}
-    ]
-
-    Enum.each(invalids, fn item ->
-      assert item[:result] == Done.exec(item[:test_arg], list)
-    end)
-
-    replace = fn index, list ->
-      item = list |> Enum.at(index)
-                  |> (&(%Ticket{&1 | status: "x"})).()
-      List.replace_at(list, index, item)
-    end
-
-    {_, list} = makeSample()
-    expected = replace.(0, list)
-    list = Done.exec([1], list)
-    assert expected == list
-
-    list = expected
-    expected = replace.(2, list)
-    list = Done.exec([1], list)
+  test "test of cancel command" do
+    callFinishedFunc("-", &Finished.cancel/2)
   end
 end
