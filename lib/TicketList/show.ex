@@ -4,20 +4,7 @@ defmodule TicketList.Show do
     case {result, Enum.count(tickets)} do
       {{:error, _}, _} -> result
       {:ok, 0} -> {:error, :empty_list}
-      {:ok, _} ->
-        addIndex = &(Integer.to_string(&1) <> ", " <> &2)
-        
-        puts = fn
-          [head | []],  _f -> [addIndex.(1, head)]
-          [head | tail], f ->
-            newStr = addIndex.(Enum.count(tail) + 1, head)
-            [newStr | f.(tail, f)]
-        end
-
-        tickets |> Enum.filter(&(&1[:status] == " "))
-                |> update_in([Access.all], &Ticket.toString/1)
-                |> puts.(puts)
-                |> Enum.reverse
+      {:ok, _} -> create_result(tickets)
     end
   end
 
@@ -26,5 +13,38 @@ defmodule TicketList.Show do
       []  -> :ok
       _   -> {:error, :invalid_args}
     end
+  end
+
+  def create_result(tickets) do
+    addIndex = &(Integer.to_string(&1) <> ", " <> &2)
+
+    append = &([&1 | &2])
+    
+    puts = fn
+      [head | []],  _f -> [addIndex.(1, head)]
+      [head | tail], f ->
+        newStr = addIndex.(Enum.count(tail) + 1, head)
+        [newStr | f.(tail, f)]
+    end
+
+    mklist = fn sign ->
+      type = case sign do
+        " " -> "Todo"
+        "x" -> "Done"
+        "-" -> "Cancel"
+      end
+
+      result = []
+      result = append.(type, result)
+      result = append.("----------", result)
+
+      tickets |> Enum.filter(&(&1[:status] == sign))
+              |> update_in([Access.all], &Ticket.toString/1)
+              |> puts.(puts)
+              |> Enum.reverse
+              |> Enum.reduce(result, &(append.(&1, &2)))
+    end
+
+    mklist.("-") ++ ["" | mklist.("x")] ++ ["" | mklist.(" ")] |> Enum.reverse
   end
 end
