@@ -2,7 +2,7 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
-  alias TicketList.{Show, Add, Done}
+  alias TicketList.{Show, Add, Finished}
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -69,7 +69,7 @@ defmodule TodocmdTest do
     ]
 
     Enum.each(invalids, fn item ->
-      assert item[:result] == Done.exec(item[:test_arg], list)
+      assert item[:result] == Finished.done(item[:test_arg], list)
     end)
 
     replace = fn index, list ->
@@ -80,11 +80,11 @@ defmodule TodocmdTest do
 
     {_, list} = makeSample()
     expected = replace.(0, list)
-    list = Done.exec([1], list)
+    list = Finished.done([1], list)
     assert expected == list
 
     list = expected
     expected = replace.(2, list)
-    list = Done.exec([1], list)
+    list = Finished.done([1], list)
   end
 end

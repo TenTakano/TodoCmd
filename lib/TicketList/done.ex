@@ -1,12 +1,14 @@
-defmodule TicketList.Done do
-  def exec(args, tickets) do
+defmodule TicketList.Finished do
+  def done(args, tickets), do: exec(args, tickets, "x")
+
+  def exec(args, tickets, command) do
     result = parse_args(args, tickets)
     case result do
       {:error, _} -> result
       index       ->
         item = tickets  |> Enum.filter(&(&1[:status] == " "))
                         |> Enum.at(index - 1)
-                        |> (&(%Ticket{&1 | status: "x"})).()
+                        |> (&(%Ticket{&1 | status: command})).()
 
         cnvtd_index = convert_index(index, tickets, 0)
         List.replace_at(tickets, cnvtd_index, item)

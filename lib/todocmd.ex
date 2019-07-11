@@ -1,7 +1,7 @@
 defmodule Todocmd do
   @configfile "./config.json"
 
-  alias TicketList.{Show, Add, Done}
+  alias TicketList.{Show, Add, Finished}
 
   def main(args) do
     args = case args do
@@ -21,7 +21,7 @@ defmodule Todocmd do
     case subcommand do
       "show"    -> Show.exec(args, tickets) |> Enum.each(&(IO.puts &1))
       "add"     -> exec_subcommand(args, tickets, &Add.exec/2)
-      "done"    -> exec_subcommand(args, tickets, &Done.exec/2)
+      "done"    -> exec_subcommand(args, tickets, &Finished.done/2)
       "cancel"  -> IO.puts "cancel command"
       "mod"     -> IO.puts "mod command"
       "flush"   -> IO.puts "flush command"
