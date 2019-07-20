@@ -33,6 +33,7 @@ defmodule Todocmd do
     %{"targetdir" => targetdir} = get_config()
 
     tickets = f.(args, tickets)
+
     result = File.write(targetdir, Poison.encode!(tickets))
     case result do
       {:error, reason}  -> IO.puts(reason)
