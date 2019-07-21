@@ -38,13 +38,16 @@ defmodule TicketList.Show do
       result = append.(type, result)
       result = append.("----------", result)
 
-      tickets |> Enum.filter(&(&1[:status] == sign))
-              |> update_in([Access.all], &Ticket.toString/1)
-              |> puts.(puts)
-              |> Enum.reverse
-              |> Enum.reduce(result, &(append.(&1, &2)))
+      target = Enum.filter(tickets, &(&1[:status] == sign))
+      case Enum.count(target) do
+        0 -> []
+        _ -> target |> update_in([Access.all], &Ticket.toString/1)
+                    |> puts.(puts)
+                    |> Enum.reverse
+                    |> Enum.reduce(result, &(append.(&1, &2)))
+      end
     end
 
-    mklist.("-") ++ ["" | mklist.("x")] ++ ["" | mklist.(" ")] |> Enum.reverse
+    mklist.("-") ++ mklist.("x") ++ mklist.(" ") |> Enum.reverse
   end
 end
