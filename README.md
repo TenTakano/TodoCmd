@@ -1,21 +1,16 @@
-# Todocmd
+# TodoCmd
+TodoCmd is a system for management tasks. The base concept of todo list model is from todo.txt. Native todo.txt is very simple and useful, however, it can be complex if each task contain extra information (e.g. timestamp of add task, tags, memos and etc...). Such kind of information decrease readbility of the list.
+TodoCmd helps to write the todo list and manages the list with the task details. 
 
-**TODO: Add description**
+## Command
+todo \<command\> [\<args\>]
 
-## Installation
+If you type "todolist" without any args or sub commands, tasks stored in list file will be displayed.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `todocmd` to your list of dependencies in `mix.exs`:
+These are sub commands:
 
-```elixir
-def deps do
-  [
-    {:todocmd, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/todocmd](https://hexdocs.pm/todocmd).
-
+| command | Feature |
+| :---: | :--- |
+| add | Add tasks to a list |
+| done | Change status of a task done |
+| cancel | Change status of a task cancel. This command may be used in case the task no longer need to do |
