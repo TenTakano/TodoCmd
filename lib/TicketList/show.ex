@@ -18,13 +18,11 @@ defmodule TicketList.Show do
   def create_result(tickets) do
     addIndex = &(Integer.to_string(&1) <> ", " <> &2)
 
-    append = &([&1 | &2])
-    
     puts = fn
-      [head | []],  _f -> [addIndex.(1, head)]
-      [head | tail], f ->
-        newStr = addIndex.(Enum.count(tail) + 1, head)
-        [newStr | f.(tail, f)]
+      [head | []],  _f, n -> [addIndex.(n, head)]
+      [head | tail], f, n ->
+        newHead = addIndex.(n, head)
+        [newHead | f.(tail, f, n + 1)]
     end
 
     mklist = fn sign ->
@@ -35,16 +33,15 @@ defmodule TicketList.Show do
       end
 
       result = []
-      result = append.(type, result)
-      result = append.("----------", result)
+      result = [type | result]
+      result = ["----------" | result]
 
       target = Enum.filter(tickets, &(&1[:status] == sign))
       case Enum.count(target) do
         0 -> []
         _ -> target |> update_in([Access.all], &Ticket.toString/1)
-                    |> puts.(puts)
-                    |> Enum.reverse
-                    |> Enum.reduce(result, &(append.(&1, &2)))
+                    |> puts.(puts, 1)
+                    |> Enum.reduce(result, &([&1 | &2]))
       end
     end
 
