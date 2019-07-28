@@ -1,3 +1,7 @@
+# Copyright(c) 2019 TenTakano
+# All rights reserved.
+# See License in the project root for license information.
+
 defmodule TicketList.Finished do
   def done(args, tickets), do: exec(args, tickets, "x")
   def cancel(args, tickets), do: exec(args, tickets, "-")

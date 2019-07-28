@@ -1,3 +1,7 @@
+# Copyright(c) 2019 TenTakano
+# All rights reserved.
+# See License in the project root for license information.
+
 defmodule TicketList.Show do
   def exec(args, tickets) do
     result = check_args(args)
