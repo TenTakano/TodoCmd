@@ -7,12 +7,11 @@ defmodule TicketList.Finished do
     case result do
       {:error, _} -> result
       index       ->
-        item = tickets  |> Enum.filter(&(&1[:status] == " "))
-                        |> Enum.at(index - 1)
-                        |> (&(%Ticket{&1 | status: command})).()
+        target = tickets  |> Enum.filter(&(&1[:status] == " "))
+                          |> Enum.at(index - 1)
 
-        cnvtd_index = convert_index(index, tickets, 0)
-        List.replace_at(tickets, cnvtd_index, item)
+        targetIndex = Enum.find_index(tickets, &(&1 == target))
+        List.update_at(tickets, targetIndex, &(%Ticket{&1 | status: command}))
     end
   end
 
@@ -33,14 +32,6 @@ defmodule TicketList.Finished do
     case Enum.count(args) do
       1 -> Enum.at(args, 0) |> parse.()
       _ -> {:error, :invalid_args}
-    end
-  end
-
-  defp convert_index(index, tickets, current) do
-    case {index, Enum.at(tickets, current)} do
-      {_, %{status: s}} when s == "x" -> convert_index(index, tickets, current + 1)
-      {1, _}                          -> current
-      {n, _} when n > 1               -> convert_index(n - 1, tickets, current + 1)
     end
   end
 end
