@@ -20,6 +20,7 @@ defmodule TodocmdTest do
   end
 
   defp callFinishedFunc(sign, f) do
+    # test invalid cases
     {_, list} = makeSample()
     length = list |> Enum.filter(&(&1[:status] == " "))
                   |> Enum.count
@@ -35,6 +36,7 @@ defmodule TodocmdTest do
       assert item[:result] == f.(item[:test_arg], list)
     end)
 
+    # test valid cases
     replace = fn index, list ->
       item = list |> Enum.at(index)
                   |> (&(%Ticket{&1 | status: sign})).()
@@ -49,6 +51,7 @@ defmodule TodocmdTest do
     list = expected
     expected = replace.(2, list)
     list = f.(["1"], list)
+    assert expected == list
   end
 
   # Todo: uncomment when timezone issue is resolved
