@@ -51,6 +51,7 @@ defmodule TodocmdTest do
     list = expected
     expected = replace.(2, list)
     list = f.(["1"], list)
+    assert expected == list
   end
 
   # Todo: uncomment when timezone issue is resolved
