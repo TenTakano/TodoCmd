@@ -3,7 +3,7 @@ defmodule TicketList.Add do
     result = parse_args(args)
     case result do
       {:error, reason}  -> result
-      title             -> [%Ticket{title: title, add: DateTime.utc_now, status: " "} | tickets]
+      title             -> tickets ++ [%Ticket{title: title, add: DateTime.utc_now, status: " "}]
     end
   end
 
