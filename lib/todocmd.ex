@@ -3,9 +3,12 @@
 # See License in the project root for license information.
 
 defmodule Todocmd do
-  @configfile "./config.json"
-
   alias TicketList.{Show, Add, Finished}
+
+  @dirname  ".todocmd"
+  @filename "list.json"
+  defp filePath, do: System.user_home <> "/" <> @dirname
+  defp fullPath, do: filePath() <> "/" <> @filename
 
   def main(args) do
     args = case args do
@@ -13,13 +16,16 @@ defmodule Todocmd do
       _  -> args
     end
     
-    %{"targetdir" => targetdir} = get_config()
-
-    tickets = case File.read(targetdir) do
-              {:error, _} -> []
-              {:ok, body} -> body |> Poison.decode!(as: [%Ticket{}])
-                                  |> update_in([Access.all, :add], &DateTime.from_iso8601/1)
-            end
+    tickets = case File.read(fullPath()) do
+      {:error, :enoent} ->
+        File.mkdir!(filePath())
+        []
+      {:error, reason} ->
+        IO.puts reason
+      {:ok, body} -> 
+        body  |> Poison.decode!(as: [%Ticket{}])
+              |> update_in([Access.all, :add], &DateTime.from_iso8601/1)
+    end
 
     [subcommand | args] = args
     case subcommand do
@@ -34,19 +40,12 @@ defmodule Todocmd do
   end
 
   def exec_subcommand(args, tickets, f) do
-    %{"targetdir" => targetdir} = get_config()
-
     tickets = f.(args, tickets)
 
-    result = File.write(targetdir, Poison.encode!(tickets))
+    result = File.write(fullPath(), Poison.encode!(tickets))
     case result do
-      {:error, reason}  -> IO.puts(reason)
       :ok               -> TicketList.Show.exec([], tickets) |> Enum.each(&(IO.puts &1))
+      {:error, reason}  -> IO.puts(reason)
     end
-  end
-
-  def get_config do
-    @configfile |> File.read!
-                |> Poison.decode!
   end
 end
