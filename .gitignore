@@ -25,3 +25,7 @@ todocmd-*.tar
 todolist.json
 
 .tool-versions
+
+.DS_Store
+
+TodoCmd
