@@ -34,9 +34,6 @@ defmodule Todocmd do
       "done"    -> exec_subcommand(args, issues, &Finish.done/2)
       "cancel"  -> exec_subcommand(args, issues, &Finish.cancel/2)
       "delete"  -> exec_subcommand(args, issues, &Delete.exec/2)
-      "mod"     -> IO.puts "mod command"
-      "flush"   -> IO.puts "flush command"
-      "list"    -> IO.puts "list command"
     end
   end
 
