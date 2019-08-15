@@ -2,13 +2,13 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule TicketList.Show do
-  def exec(args, tickets) do
+defmodule IssueList.Show do
+  def exec(args, issues) do
     result = check_args(args)
-    case {result, Enum.count(tickets)} do
+    case {result, Enum.count(issues)} do
       {{:error, _}, _} -> result
       {:ok, 0} -> {:error, :empty_list}
-      {:ok, _} -> create_result(tickets)
+      {:ok, _} -> create_result(issues)
     end
   end
 
@@ -19,7 +19,7 @@ defmodule TicketList.Show do
     end
   end
 
-  def create_result(tickets) do
+  def create_result(issues) do
     addIndex = &(Integer.to_string(&1) <> ", " <> &2)
 
     puts = fn
@@ -40,10 +40,10 @@ defmodule TicketList.Show do
       result = [type | result]
       result = ["----------" | result]
 
-      target = Enum.filter(tickets, &(&1[:status] == sign))
+      target = Enum.filter(issues, &(&1[:status] == sign))
       case Enum.count(target) do
         0 -> []
-        _ -> target |> update_in([Access.all], &Ticket.toString/1)
+        _ -> target |> update_in([Access.all], &Issue.toString/1)
                     |> puts.(puts, 1)
                     |> Enum.reduce(result, &([&1 | &2]))
       end

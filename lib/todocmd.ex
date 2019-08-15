@@ -3,7 +3,7 @@
 # See License in the project root for license information.
 
 defmodule Todocmd do
-  alias TicketList.{Show, Add, Finished}
+  alias IssueList.{Show, Add, Finish}
 
   @dirname  ".todocmd"
   @filename "list.json"
@@ -16,35 +16,35 @@ defmodule Todocmd do
       _  -> args
     end
     
-    tickets = case File.read(fullPath()) do
+    issues = case File.read(fullPath()) do
       {:error, :enoent} ->
         File.mkdir!(filePath())
         []
       {:error, reason} ->
         IO.puts reason
       {:ok, body} -> 
-        body  |> Poison.decode!(as: [%Ticket{}])
+        body  |> Poison.decode!(as: [%Issue{}])
               |> update_in([Access.all, :add], &DateTime.from_iso8601/1)
     end
 
     [subcommand | args] = args
     case subcommand do
-      "show"    -> Show.exec(args, tickets) |> Enum.each(&(IO.puts &1))
-      "add"     -> exec_subcommand(args, tickets, &Add.exec/2)
-      "done"    -> exec_subcommand(args, tickets, &Finished.done/2)
-      "cancel"  -> exec_subcommand(args, tickets, &Finished.cancel/2)
+      "show"    -> Show.exec(args, issues) |> Enum.each(&(IO.puts &1))
+      "add"     -> exec_subcommand(args, issues, &Add.exec/2)
+      "done"    -> exec_subcommand(args, issues, &Finish.done/2)
+      "cancel"  -> exec_subcommand(args, issues, &Finish.cancel/2)
       "mod"     -> IO.puts "mod command"
       "flush"   -> IO.puts "flush command"
       "list"    -> IO.puts "list command"
     end
   end
 
-  def exec_subcommand(args, tickets, f) do
-    tickets = f.(args, tickets)
+  def exec_subcommand(args, issues, f) do
+    issues = f.(args, issues)
 
-    result = File.write(fullPath(), Poison.encode!(tickets))
+    result = File.write(fullPath(), Poison.encode!(issues))
     case result do
-      :ok               -> TicketList.Show.exec([], tickets) |> Enum.each(&(IO.puts &1))
+      :ok               -> IssueList.Show.exec([], issues) |> Enum.each(&(IO.puts &1))
       {:error, reason}  -> IO.puts(reason)
     end
   end

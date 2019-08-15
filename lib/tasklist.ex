@@ -2,7 +2,7 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule Ticket do
+defmodule Issue do
   defstruct [:index, :status, :title, :add, :finished, :detals, :tags]
 
   @behaviour Access
@@ -13,10 +13,10 @@ defmodule Ticket do
   end
 
   @impl Access
-  def get_and_update(%Ticket{} = ticket, key, function) do
-    {:ok, value} = Map.fetch(ticket, key)
+  def get_and_update(%Issue{} = issue, key, function) do
+    {:ok, value} = Map.fetch(issue, key)
     {getValue, {:ok, newValue, _}} = function.(value)
-    {getValue, %{ticket | key => newValue}}
+    {getValue, %{issue | key => newValue}}
   end
 
   @impl Access
@@ -25,12 +25,12 @@ defmodule Ticket do
     {value, struct(__MODULE__, data)}
   end
 
-  def toString(ticket) do
+  def toString(issue) do
     # Todo: Implement timezone shift by soft cording
-    time = ticket[:add] |> DateTime.add(3600 * 9, :second)
+    time = issue[:add] |> DateTime.add(3600 * 9, :second)
                         |> DateTime.to_string
                         |> String.slice(0, 19)
                       
-    ticket[:title] <> ", " <> time <> ", " <> ticket[:status]
+    issue[:title] <> ", " <> time
   end
 end
