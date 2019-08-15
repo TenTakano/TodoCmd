@@ -5,26 +5,12 @@
 defmodule IssueList.FinishTest do
 	use ExUnit.Case
 
-	alias IssueList.Finish
-
-  defp makeSample do
-    sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
-                        hour: 18, minute: 50, second: 7, microsecond: {0, 0},
-                        utc_offset: 0, std_offset: 0,
-                        time_zone: "Etc/GMT", zone_abbr: "UTC"}
-    
-    sampleList = [
-      %Issue{status: " ", title: "Test1", add: sampleTime},
-      %Issue{status: "x", title: "Test2", add: sampleTime},
-      %Issue{status: " ", title: "Test3", add: sampleTime}
-    ]
-
-    {sampleTime, sampleList}
-  end
+  alias IssueList.Finish
+  alias TestHelper, as: Helper
 
   defp callFinishFunc(sign, f) do
     # test invalid cases
-    {_, list} = makeSample()
+    {_, list} = Helper.makeSample()
     length = list |> Enum.filter(&(&1[:status] == " "))
                   |> Enum.count
 
@@ -46,7 +32,7 @@ defmodule IssueList.FinishTest do
       List.replace_at(list, index, item)
     end
 
-    {_, list} = makeSample()
+    {_, list} = Helper.makeSample()
     expected = replace.(0, list)
     list = f.(["1"], list)
     assert expected == list
