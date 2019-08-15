@@ -29,21 +29,30 @@ defmodule Todocmd do
 
     [subcommand | args] = args
     case subcommand do
-      "show"    -> Show.exec(args, issues) |> Enum.each(&(IO.puts &1))
       "add"     -> exec_subcommand(args, issues, &Add.exec/2)
       "done"    -> exec_subcommand(args, issues, &Finish.done/2)
       "cancel"  -> exec_subcommand(args, issues, &Finish.cancel/2)
       "delete"  -> exec_subcommand(args, issues, &Delete.exec/2)
+      "show"    -> puts_list(issues)
     end
   end
 
-  def exec_subcommand(args, issues, f) do
+  defp exec_subcommand(args, issues, f) do
     issues = f.(args, issues)
 
     result = File.write(fullPath(), Poison.encode!(issues))
     case result do
-      :ok               -> IssueList.Show.exec([], issues) |> Enum.each(&(IO.puts &1))
+      :ok               -> puts_list(issues)
       {:error, reason}  -> IO.puts(reason)
+    end
+  end
+
+  defp puts_list(issues) do
+    result = Show.exec([], issues)
+    case result do
+      [_ | _]               -> Enum.each(result, &(IO.puts &1))
+      {:error, :empty_list} -> IO.puts "There is no tasks"
+      {:error, reason}      -> IO.inspect reason
     end
   end
 end
