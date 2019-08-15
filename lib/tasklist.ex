@@ -31,6 +31,6 @@ defmodule Issue do
                         |> DateTime.to_string
                         |> String.slice(0, 19)
                       
-    issue[:title] <> ", " <> time <> ", " <> issue[:status]
+    issue[:title] <> ", " <> time
   end
 end
