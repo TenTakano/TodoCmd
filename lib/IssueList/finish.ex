@@ -2,7 +2,7 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule IssueList.Finished do
+defmodule IssueList.Finish do
   def done(args, issues), do: exec(args, issues, "x")
   def cancel(args, issues), do: exec(args, issues, "-")
 

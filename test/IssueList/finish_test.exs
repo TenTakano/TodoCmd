@@ -2,10 +2,10 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule IssueList.FinishedTest do
+defmodule IssueList.FinishTest do
 	use ExUnit.Case
 
-	alias IssueList.Finished
+	alias IssueList.Finish
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -22,7 +22,7 @@ defmodule IssueList.FinishedTest do
     {sampleTime, sampleList}
   end
 
-  defp callFinishedFunc(sign, f) do
+  defp callFinishFunc(sign, f) do
     # test invalid cases
     {_, list} = makeSample()
     length = list |> Enum.filter(&(&1[:status] == " "))
@@ -58,10 +58,10 @@ defmodule IssueList.FinishedTest do
 	end
 	
   test "test of done command" do
-    callFinishedFunc("x", &Finished.done/2)
+    callFinishFunc("x", &Finish.done/2)
   end
 
   test "test of cancel command" do
-    callFinishedFunc("-", &Finished.cancel/2)
+    callFinishFunc("-", &Finish.cancel/2)
   end	
 end

@@ -3,7 +3,7 @@
 # See License in the project root for license information.
 
 defmodule Todocmd do
-  alias IssueList.{Show, Add, Finished}
+  alias IssueList.{Show, Add, Finish}
 
   @dirname  ".todocmd"
   @filename "list.json"
@@ -31,8 +31,8 @@ defmodule Todocmd do
     case subcommand do
       "show"    -> Show.exec(args, issues) |> Enum.each(&(IO.puts &1))
       "add"     -> exec_subcommand(args, issues, &Add.exec/2)
-      "done"    -> exec_subcommand(args, issues, &Finished.done/2)
-      "cancel"  -> exec_subcommand(args, issues, &Finished.cancel/2)
+      "done"    -> exec_subcommand(args, issues, &Finish.done/2)
+      "cancel"  -> exec_subcommand(args, issues, &Finish.cancel/2)
       "mod"     -> IO.puts "mod command"
       "flush"   -> IO.puts "flush command"
       "list"    -> IO.puts "list command"
