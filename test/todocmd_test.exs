@@ -6,7 +6,7 @@ defmodule TodocmdTest do
   use ExUnit.Case
   doctest Todocmd
 
-  alias TicketList.{Show, Add, Finished}
+  alias IssueList.{Show, Add, Finished}
 
   defp makeSample do
     sampleTime =  %DateTime{year: 2019, month: 7, day: 7,
@@ -15,9 +15,9 @@ defmodule TodocmdTest do
                         time_zone: "Etc/GMT", zone_abbr: "UTC"}
     
     sampleList = [
-      %Ticket{status: " ", title: "Test1", add: sampleTime},
-      %Ticket{status: "x", title: "Test2", add: sampleTime},
-      %Ticket{status: " ", title: "Test3", add: sampleTime}
+      %Issue{status: " ", title: "Test1", add: sampleTime},
+      %Issue{status: "x", title: "Test2", add: sampleTime},
+      %Issue{status: " ", title: "Test3", add: sampleTime}
     ]
 
     {sampleTime, sampleList}
@@ -43,7 +43,7 @@ defmodule TodocmdTest do
     # test valid cases
     replace = fn index, list ->
       item = list |> Enum.at(index)
-                  |> (&(%Ticket{&1 | status: sign})).()
+                  |> (&(%Issue{&1 | status: sign})).()
       List.replace_at(list, index, item)
     end
 
@@ -70,7 +70,7 @@ defmodule TodocmdTest do
   #     "3, Test3, " <> time <> ",  "
   #   ]
 
-  #   assert TicketList.to_string(list) == expected
+  #   assert IssueList.to_string(list) == expected
   # end
 
   test "test of show command" do

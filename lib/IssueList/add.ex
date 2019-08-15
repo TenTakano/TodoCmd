@@ -2,12 +2,12 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule TicketList.Add do
-  def exec(args, tickets) do
+defmodule IssueList.Add do
+  def exec(args, issues) do
     result = parse_args(args)
     case result do
       {:error, _} -> result
-      title       -> tickets ++ [%Ticket{title: title, add: DateTime.utc_now, status: " "}]
+      title       -> issues ++ [%Issue{title: title, add: DateTime.utc_now, status: " "}]
     end
   end
 

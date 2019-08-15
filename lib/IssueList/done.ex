@@ -2,25 +2,25 @@
 # All rights reserved.
 # See License in the project root for license information.
 
-defmodule TicketList.Finished do
-  def done(args, tickets), do: exec(args, tickets, "x")
-  def cancel(args, tickets), do: exec(args, tickets, "-")
+defmodule IssueList.Finished do
+  def done(args, issues), do: exec(args, issues, "x")
+  def cancel(args, issues), do: exec(args, issues, "-")
 
-  def exec(args, tickets, command) do
-    result = parse_args(args, tickets)
+  def exec(args, issues, command) do
+    result = parse_args(args, issues)
     case result do
       {:error, _} -> result
       index       ->
-        target = tickets  |> Enum.filter(&(&1[:status] == " "))
+        target = issues  |> Enum.filter(&(&1[:status] == " "))
                           |> Enum.at(index - 1)
 
-        targetIndex = Enum.find_index(tickets, &(&1 == target))
-        List.update_at(tickets, targetIndex, &(%Ticket{&1 | status: command}))
+        targetIndex = Enum.find_index(issues, &(&1 == target))
+        List.update_at(issues, targetIndex, &(%Issue{&1 | status: command}))
     end
   end
 
-  defp parse_args(args, tickets) do
-    length = tickets  |> Enum.filter(&(&1[:status] == " "))
+  defp parse_args(args, issues) do
+    length = issues  |> Enum.filter(&(&1[:status] == " "))
                       |> Enum.count
 
     parse = fn arg ->
